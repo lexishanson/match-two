@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-import Card from './Card';
 import Game from './Game';
 import logo from './logo.svg';
 import './App.css';

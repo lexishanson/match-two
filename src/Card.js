@@ -1,12 +1,30 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 const Card = ({ id, flipped, value, suit, onClick }) => {
+  const suitSymbol = suit => {
+    if (suit === 'spades') {
+      return '♠';
+    }
+    if (suit === 'clubs') {
+      return '♣';
+    }
+    if (suit === 'hearts') {
+      return '♥';
+    }
+    if (suit === 'diamonds') {
+      return '♦';
+    }
+  };
   return (
     <div
-      className={['Card', flipped ? 'flipped' : ''].join('')}
+      className={[
+        'card',
+        flipped ? 'flipped' : '',
+        suit === 'diamonds' || suit === 'hearts' ? 'red-card' : 'black-card'
+      ].join(' ')}
       onClick={onClick}
     >
-      {flipped && `${value} ${suit}`}
+      {flipped && `${value} ${suitSymbol(suit)}`}
     </div>
   );
 };

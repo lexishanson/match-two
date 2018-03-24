@@ -6,10 +6,14 @@ class Game extends Component {
     super();
     this.state = {
       deck: this.initialCards(),
-      matches: 0,
-      flippedCardsIndices: []
+      matches: {},
+      flippedCardsIndices: [],
+      statusMessage: 'Click two cards to start'
       // value, location
-      // {value: }
+      // {value: [suit: 'hearts', location: 4]}
+      // going to want a list of matches: value, suit
+      // going to want to know location and not render it
+      // if card in matches...
     };
   }
   // this.state.deck[flippedCardsIndices].value === card.value
@@ -47,8 +51,8 @@ class Game extends Component {
       .map((card, index) => ({
         suit: suits[index % suits.length],
         value: values[index % values.length],
-        flipped: false,
-        matched: false,
+        // flipped: false,
+        // matched: false,
         location: index
       }));
   };
@@ -64,28 +68,45 @@ class Game extends Component {
       if (isSecondFlip) {
         const isMatch = this.checkMatch(card);
         if (isMatch) {
-          matches = card.value;
+          let matchPair = flippedCardsIndices.map((i, j) => {
+            return deck[flippedCardsIndices[j]];
+          });
+          const newMatch = matches[card.value]
+            ? matches[card.value].concat(matchPair)
+            : matchPair;
+          matches = { ...matches, [card.value]: newMatch };
         }
         setTimeout(() => {
-          // consider matches as [{card.value: [card.suit, card.suit]}]
           this.unflipCards(card, deck, flippedCardsIndices);
-          if (!isMatch) {
-            alert('not a match');
-          }
+          this.renderCards();
+          isMatch
+            ? this.setState({ statusMessage: "Congrats, that's a match!" })
+            : this.setState({ statusMessage: 'Not a match' });
         }, 500);
       }
       return {
         ...prevState,
         deck,
         matches,
+        statusMessage: '...',
         flippedCardsIndices
       };
     });
   };
 
-  renderCards = (cards, matchedCards) => {
-    return cards.map((card, index) => {
-      if (card)
+  renderCards = () => {
+    const { deck, matches } = this.state;
+    return deck.map((card, index) => {
+      const cardNotMatched = () => {
+        if (matches[card.value]) {
+          return matches[card.value].every(matchedValue => {
+            return matchedValue.suit !== card.suit;
+          });
+        }
+        return true;
+      };
+      if (card && cardNotMatched())
+      // need to build way to check for wins. when no cards are rendered.
         return (
           <Card
             id={`${card.value}-${card.suit}`}
@@ -105,10 +126,10 @@ class Game extends Component {
   };
 
   render() {
-    console.log(this.state.deck);
     return (
-      <div className="Game">
-        {this.renderCards(this.state.deck, this.state.matches)}
+      <div>
+        <div className="match-status">{`${this.state.statusMessage}`}</div>
+        <div className="game">{this.renderCards()}</div>
       </div>
     );
   }

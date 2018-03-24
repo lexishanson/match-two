@@ -33,7 +33,7 @@
 
 /* Game */
 
-.Game {
+.game {
   max-width: 960px;
   margin: 0 auto;
   display: grid;
@@ -43,19 +43,23 @@
   justify-items: center;
 }
 
-.Card {
+.card {
   /* float: left; */
   cursor: pointer;
   width: 6rem;
   height: 8rem;
   padding: 1rem;
   margin: 10px;
-  border: 1px solid black;
-  text-align: center;
-  background-color: white;
+  border: 1px solid gray;
+  background-color: rgba(3, 163, 187, .5);
+  background-size:16px 16px;
+  box-shadow: 2px 2px 2px gray;
+  font-size: 2.2rem;
   display: flex;
-  /* align-items: center; */
   justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+
 }
 /* // .Card--flipped */
 .flipped {
@@ -65,4 +69,12 @@
 /* // .Card--matched */
 .matched {
   background-color: green;
+}
+
+.red-card {
+  color: red;
+}
+
+.black-card {
+  color: black;
 }
