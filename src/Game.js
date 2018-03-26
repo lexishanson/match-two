@@ -47,8 +47,20 @@ class Game extends Component {
 
   key = card => card.value + card.suit;
 
+  playComputerMove = () => {
+    const randomIndex = () => Math.floor(Math.random() * 52);
+    const indexes = [randomIndex(), randomIndex()];
+    this.setState(state => ({
+      ...state,
+      statusMessage: `Computer flips: ${indexes}`,
+      flippedCardsIndices: indexes
+    }));
+    setTimeout(this.checkForMatch, 500);
+  };
+
   checkForMatch = () => {
     this.setState(state => {
+      console.log('checkForMatch', state);
       let {
         deck,
         gameType,
@@ -64,7 +76,7 @@ class Game extends Component {
       const isMatch =
         cardOne.value === cardTwo.value && cardOne.suit !== cardTwo.suit;
       matches = isMatch ? [...matches, match] : matches;
-      return {
+      const newState = {
         ...state,
         matchedCards: isMatch
           ? {
@@ -76,9 +88,13 @@ class Game extends Component {
         matches,
         statusMessage: isMatch ? "Congrats, that's a match!" : 'Not a match',
         flippedCardsIndices: [],
-        gameOver: matches.length === 2 / 2,
+        gameOver: matches.length === deck.length / 2,
         turn: gameType === 'single' ? 'p1' : turn === 'p1' ? 'p2' : 'p1'
       };
+      if (newState.gameType === '2-player' && newState.turn === 'p2') {
+        setTimeout(this.playComputerMove, 1000);
+      }
+      return newState;
     });
   };
 
@@ -133,22 +149,22 @@ class Game extends Component {
       <div className="single-player-wrapper">
         <p>Your Matches</p>
         <ul className="matches-list">{this.matchedCards('p1')}</ul>
-        <p>{`Matches so far ${this.state.matches.length}`}</p>
+        <p>{`Matches so far: ${this.state.matches.length}`}</p>
       </div>
     );
   };
 
   onCardClick = card => e => {
-    if (this.state.flippedCardsIndices.length >= 2) {
+    const { gameType, turn, flippedCardsIndices } = this.state;
+    const isComputerMove = gameType === '2-player' && turn === 'p2';
+    if (flippedCardsIndices.length >= 2 || isComputerMove) {
       return;
     }
     this.setState(state => {
       let { flippedCardsIndices } = state;
       flippedCardsIndices.push(card.location);
       if (flippedCardsIndices.length === 2) {
-        setTimeout(() => {
-          this.checkForMatch();
-        }, 500);
+        setTimeout(this.checkForMatch, 500);
       }
       return {
         ...state,
