@@ -10,7 +10,7 @@ Game will be served on localhost: 3000
 
 ## How to Play
 
-* To start, select "By Myself" if you'd like to play alone, or "Against Computer" if you'd like a challenge. The "Computer" player has a perfect memory, so it's hard to beat!
+* Select "By Myself" or "Against Computer". The "Computer" player has a perfect memory, so be ready for a challenge!
 
 * Cards will be shuffled and displayed on the board. Select two cards to flip over to see if they are a match. A match is based on the _value_ of the card, not the suit.
 
@@ -18,7 +18,7 @@ Game will be served on localhost: 3000
 
 * If playing 2-player, Computer will take it's turn next. Wait a moment and watch the status at the top of the screen to see what the Computer selected.
 
-* Continue playing until all 52 card have been matched. If playing 2-player, you'll be told if you or the computer won.
+* Continue playing until all 52 card have been matched. If playing 2-player, whoever gets the most matches wins!
 
 
 ## TODO
