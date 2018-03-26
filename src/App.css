@@ -9,12 +9,13 @@
 
 .App-header {
   background-color: #222;
-  height: 150px;
+  height: 100px;
   padding: 20px;
   color: white;
 }
 
 .App-title {
+  padding: 20px;
   font-size: 1.5em;
 }
 
@@ -35,42 +36,141 @@
 
 .game {
   max-width: 960px;
-  margin: 0 auto;
+  margin: 40px auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   grid-auto-rows: minmax(150px, auto);
-  grid-gap: 0.5em;
+  grid-gap: 1em;
   justify-items: center;
 }
 
+button {
+  margin: 20px 10px;
+}
+button:focus {
+  opacity: 0.75;
+}
+
+/* Board Cards */
 .card {
   /* float: left; */
   cursor: pointer;
-  width: 6rem;
-  height: 8rem;
-  padding: 1rem;
-  margin: 10px;
-  border: 1px solid gray;
-  background-color: rgba(3, 163, 187, .5);
-  background-size:16px 16px;
-  box-shadow: 2px 2px 2px gray;
   font-size: 2.2rem;
-  display: flex;
+  width: 3rem;
+  height: 5rem;
+  padding: 2rem;
   justify-content: center;
   align-items: center;
+  /* margin: 10px; */
+  border: 1px solid gray;
   border-radius: 10px;
-
+  /* background-color: rgba(3, 163, 187, 0.5); */
+  /* background-size: 16px 16px; */
+  box-shadow: 1px 1px 2px gray;
+  display: flex;
 }
 /* // .Card--flipped */
 .flipped {
   background-color: white;
 }
 
-/* // .Card--matched */
-.matched {
-  background-color: green;
+.unflipped {
+  background: linear-gradient(
+      135deg,
+      #ffffff 22px,
+      rgba(3, 163, 187, 0.5) 22px,
+      rgba(3, 163, 187, 0.5) 24px,
+      transparent 24px,
+      transparent 67px,
+      rgba(3, 163, 187, 0.5) 67px,
+      rgba(3, 163, 187, 0.5) 69px,
+      transparent 69px
+    ),
+    linear-gradient(
+        225deg,
+        #ffffff 22px,
+        rgba(3, 163, 187, 0.5) 22px,
+        rgba(3, 163, 187, 0.5) 24px,
+        transparent 24px,
+        transparent 67px,
+        rgba(3, 163, 187, 0.5) 67px,
+        rgba(3, 163, 187, 0.5) 69px,
+        transparent 69px
+      )0 64px;
+  background-color: #ffffff;
+  background-size: 64px 128px;
 }
 
+/* Game over */
+.game-over {
+  padding: 20px;
+}
+
+.winner {
+  font-weight: 800;
+  color: #545252;
+}
+
+/* Matches */
+.matched {
+  font-size: 50px;
+  color: rgba(3, 163, 187, 1);
+  width: 3rem;
+  height: 5rem;
+  padding: 2rem;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.matches-wrapper {
+  padding: 10px;
+  max-width: 50%;
+  margin: 20px auto;
+  padding: 10px;
+  overflow: hidden;
+  background-color: white;
+  word-wrap: break-word;
+}
+
+.matches-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+  grid-auto-rows: minmax(20px, auto);
+  grid-gap: 0.5em;
+  padding: 0 10px;
+  list-style-type: none;
+}
+
+.pairs {
+  font-size: 14px;
+  color: #545252;
+}
+
+.player-wrapper {
+  border-radius: 10px;
+  box-shadow: 1px 1px 2px 1px #545252;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.player-wrapper p {
+  color: #545252;
+  grid-column: 1 / 3;
+}
+
+.single-player-wrapper {
+  border-radius: 10px;
+  box-shadow: 1px 1px 2px 1px #545252;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.single-player-wrapper p {
+  color: #545252;
+}
+
+/* Suit and symbol colors */
 .red-card {
   color: red;
 }

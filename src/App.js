@@ -9,11 +9,11 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to Match Two</h1>
         </header>
         <p className="App-intro">
-          To get started, <code>click Start</code>
+          To get started, click <code>"Play Alone" </code>
+          or <code>"Play Against Computer"</code>
         </p>
         <Game />
       </div>

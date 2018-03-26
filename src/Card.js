@@ -1,25 +1,12 @@
 import React from 'react';
+import { suitSymbol } from './helpers';
 
 const Card = ({ id, flipped, value, suit, onClick }) => {
-  const suitSymbol = suit => {
-    if (suit === 'spades') {
-      return '♠';
-    }
-    if (suit === 'clubs') {
-      return '♣';
-    }
-    if (suit === 'hearts') {
-      return '♥';
-    }
-    if (suit === 'diamonds') {
-      return '♦';
-    }
-  };
   return (
     <div
       className={[
         'card',
-        flipped ? 'flipped' : '',
+        flipped ? 'flipped' : 'unflipped',
         suit === 'diamonds' || suit === 'hearts' ? 'red-card' : 'black-card'
       ].join(' ')}
       onClick={onClick}

@@ -1,32 +1,22 @@
 import React, { Component } from 'react';
 import Card from './Card';
+import GameOver from './GameOver';
+import { shuffle, suitSymbol } from './helpers';
 
 class Game extends Component {
   constructor() {
     super();
     this.state = {
-      deck: this.initialCards(),
-      matches: {},
+      deck: shuffle(this.initialCards()),
       flippedCardsIndices: [],
-      statusMessage: 'Click two cards to start'
-      // value, location
-      // {value: [suit: 'hearts', location: 4]}
-      // going to want a list of matches: value, suit
-      // going to want to know location and not render it
-      // if card in matches...
+      gameOver: false,
+      gameType: null,
+      matchedCards: {},
+      matches: [],
+      statusMessage: 'Click two cards to start',
+      turn: 'p1'
     };
   }
-  // this.state.deck[flippedCardsIndices].value === card.value
-  checkMatch = card => {
-    const { deck, flippedCardsIndices } = this.state;
-    const sameCardClicked = flippedCardsIndices[0] === card.location;
-    const bothCardsMatchValue =
-      deck[flippedCardsIndices[0]].value === card.value;
-    if (sameCardClicked || !bothCardsMatchValue) {
-      return false;
-    }
-    return true;
-  };
 
   initialCards = () => {
     const suits = ['hearts', 'diamonds', 'spades', 'clubs'];
@@ -51,87 +41,204 @@ class Game extends Component {
       .map((card, index) => ({
         suit: suits[index % suits.length],
         value: values[index % values.length],
-        // flipped: false,
-        // matched: false,
         location: index
       }));
   };
 
+  key = card => card.value + card.suit;
+
+  checkForMatch = () => {
+    this.setState(state => {
+      let {
+        deck,
+        gameType,
+        matches,
+        matchedCards,
+        flippedCardsIndices,
+        turn
+      } = state;
+      const cardOne = deck[flippedCardsIndices[0]];
+      const cardTwo = deck[flippedCardsIndices[1]];
+      const cards = [cardOne, cardTwo];
+      const match = { cards, owner: turn };
+      const isMatch =
+        cardOne.value === cardTwo.value && cardOne.suit !== cardTwo.suit;
+      matches = isMatch ? [...matches, match] : matches;
+      return {
+        ...state,
+        matchedCards: isMatch
+          ? {
+              ...matchedCards,
+              [this.key(cardOne)]: true,
+              [this.key(cardTwo)]: true
+            }
+          : matchedCards,
+        matches,
+        statusMessage: isMatch ? "Congrats, that's a match!" : 'Not a match',
+        flippedCardsIndices: [],
+        gameOver: matches.length === 2 / 2,
+        turn: gameType === 'single' ? 'p1' : turn === 'p1' ? 'p2' : 'p1'
+      };
+    });
+  };
+
+  gameOver = () => {};
+
+  getWinner = () => {
+    let p1Matches = 0;
+    let p2Matches = 0;
+    this.state.matches.map(match => {
+      match.owner === 'p1' ? p1Matches++ : p2Matches++;
+    });
+    if (p1Matches === p2Matches) {
+      return { winner: 'Tie', count: p1Matches };
+    } else if (p1Matches > p2Matches) {
+      return { winner: 'You', count: p1Matches };
+    }
+    return { winner: 'Computer', count: p2Matches };
+  };
+
+  matchedCards = ownerToFindMatchesFor => {
+    if (this.state.gameType === '2-player') {
+      return this.state.matches
+        .filter(({ owner }) => owner === ownerToFindMatchesFor)
+        .map(({ cards, owner }) => (
+          <li className="pairs">
+            {cards[0].value} {suitSymbol(cards[0].suit)}{' '}
+            {suitSymbol(cards[1].suit)}
+          </li>
+        ));
+    }
+    return this.state.matches.map(({ cards }) => (
+      <li className="pairs">
+        {cards[0].value} {suitSymbol(cards[0].suit)} {suitSymbol(cards[1].suit)}
+      </li>
+    ));
+  };
+
+  matchesSection = () => {
+    return this.state.gameType === '2-player' ? (
+      <div className="player-wrapper">
+        <div className="player-1">
+          <p>Your Matches</p>
+          <ul className="matches-list">{this.matchedCards('p1')}</ul>
+        </div>
+        <div className="player-2">
+          <p>Computer's Matches</p>
+          <ul className="matches-list">{this.matchedCards('p2')}</ul>
+        </div>
+        <p>{`Matches so far ${this.state.matches.length}`}</p>
+      </div>
+    ) : (
+      <div className="single-player-wrapper">
+        <p>Your Matches</p>
+        <ul className="matches-list">{this.matchedCards('p1')}</ul>
+        <p>{`Matches so far ${this.state.matches.length}`}</p>
+      </div>
+    );
+  };
+
   onCardClick = card => e => {
-    if (this.state.flippedCardsIndices.length > 1) {
+    if (this.state.flippedCardsIndices.length >= 2) {
       return;
     }
-    this.setState(prevState => {
-      let { deck, flippedCardsIndices, matches } = prevState;
+    this.setState(state => {
+      let { flippedCardsIndices } = state;
       flippedCardsIndices.push(card.location);
-      const isSecondFlip = flippedCardsIndices.length === 2;
-      if (isSecondFlip) {
-        const isMatch = this.checkMatch(card);
-        if (isMatch) {
-          let matchPair = flippedCardsIndices.map((i, j) => {
-            return deck[flippedCardsIndices[j]];
-          });
-          const newMatch = matches[card.value]
-            ? matches[card.value].concat(matchPair)
-            : matchPair;
-          matches = { ...matches, [card.value]: newMatch };
-        }
+      if (flippedCardsIndices.length === 2) {
         setTimeout(() => {
-          this.unflipCards(card, deck, flippedCardsIndices);
-          this.renderCards();
-          isMatch
-            ? this.setState({ statusMessage: "Congrats, that's a match!" })
-            : this.setState({ statusMessage: 'Not a match' });
+          this.checkForMatch();
         }, 500);
       }
       return {
-        ...prevState,
-        deck,
-        matches,
-        statusMessage: '...',
+        ...state,
+        statusMessage: `${flippedCardsIndices.length} flipped`,
         flippedCardsIndices
       };
     });
   };
 
+  renderBoard = () => {
+    if (this.state.gameOver) {
+      return (
+        <div>
+          <div className="game-over">Game Over!</div>
+          {this.state.gameType === '2-player' && (
+            <div className="winner">{`Winner: ${this.getWinner().winner} with ${
+              this.getWinner().count
+            } matches`}</div>
+          )}
+          <button onClick={() => this.restartGame()}>Play Again</button>
+          <div className="matches-wrapper">{this.matchesSection()}</div>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <div className="match-status">{`${this.state.statusMessage}`}</div>
+          <div className="matches-wrapper">{this.matchesSection()}</div>
+          <div className="game">{this.renderCards()}</div>
+        </div>
+      );
+    }
+  };
+
   renderCards = () => {
-    const { deck, matches } = this.state;
-    return deck.map((card, index) => {
-      const cardNotMatched = () => {
-        if (matches[card.value]) {
-          return matches[card.value].every(matchedValue => {
-            return matchedValue.suit !== card.suit;
-          });
-        }
-        return true;
-      };
-      if (card && cardNotMatched())
-      // need to build way to check for wins. when no cards are rendered.
-        return (
+    return this.state.deck.map(
+      (card, index) =>
+        this.state.matchedCards[card.value + card.suit] ? (
+          <div key={`${card.value}-${card.suit}`} className="matched">
+            ✓
+          </div>
+        ) : (
           <Card
             id={`${card.value}-${card.suit}`}
-            key={index}
+            key={`${card.value}-${card.suit}`}
             value={card.value}
             suit={card.suit}
             flipped={this.state.flippedCardsIndices.indexOf(index) > -1}
             onClick={this.onCardClick(card)}
           />
-        );
+        )
+    );
+  };
+
+  restartGame = () =>
+    this.setState(state => ({
+      ...state,
+      deck: shuffle(this.initialCards()),
+      flippedCardsIndices: [],
+      gameOver: false,
+      gameType: null,
+      matchedCards: {},
+      matches: [],
+      statusMessage: 'Click two cards to start',
+      turn: 'p1'
+    }));
+
+  setGameType = type => () => {
+    console.log('type selected', type);
+    return this.setState(state => {
+      return {
+        ...state,
+        gameType: type
+      };
     });
   };
 
-  unflipCards = (card, deck, flippedCardsIndices) => {
-    console.log(`indexes inside unflip ${flippedCardsIndices}`);
-    this.setState(prevState => ({ ...prevState, flippedCardsIndices: [] }));
+  showPlayOptions = () => {
+    return (
+      <div>
+        <button onClick={this.setGameType('single')}>By Myself</button>
+        <button onClick={this.setGameType('2-player')}>Against Computer</button>
+      </div>
+    );
   };
 
   render() {
-    return (
-      <div>
-        <div className="match-status">{`${this.state.statusMessage}`}</div>
-        <div className="game">{this.renderCards()}</div>
-      </div>
-    );
+    return this.state.gameType === null
+      ? this.showPlayOptions()
+      : this.renderBoard();
   }
 }
 
