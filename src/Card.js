@@ -2,6 +2,7 @@ import React from 'react';
 import { suitSymbol } from './helpers';
 
 const Card = ({ id, flipped, value, suit, onClick }) => {
+  console.log('flipped', flipped);
   return (
     <div
       className={[

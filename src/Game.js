@@ -1,22 +1,22 @@
-import React, { Component } from 'react';
-import Card from './Card';
-import { shuffle, suitSymbol } from './helpers';
+import React, { Component } from "react";
+import Card from "./Card";
+import { shuffle, suitSymbol } from "./helpers";
 
-const CARD_SUITS = ['hearts', 'diamonds', 'spades', 'clubs'];
+const CARD_SUITS = ["hearts", "diamonds", "spades", "clubs"];
 const CARD_VALUES = [
-  'A',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '10',
-  'J',
-  'Q',
-  'K'
+  "A",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "J",
+  "Q",
+  "K"
 ];
 
 class Game extends Component {
@@ -28,7 +28,7 @@ class Game extends Component {
   /* Check for a match after a pair of cards is selected */
   checkForMatch = () => {
     this.setState(state => {
-      console.log('checkForMatch', state);
+      console.log("checkForMatch", state);
       let {
         deck,
         gameType,
@@ -60,13 +60,13 @@ class Game extends Component {
             }
           : matchedCards,
         matches,
-        statusMessage: isMatch ? "Congrats, that's a match!" : 'Not a match',
+        statusMessage: isMatch ? "Congrats, that's a match!" : "Not a match",
         flippedCardsIndices: [],
         gameOver: matches.length === deck.length / 2,
-        turn: gameType === 'single' ? 'p1' : turn === 'p1' ? 'p2' : 'p1'
+        turn: gameType === "single" ? "p1" : turn === "p1" ? "p2" : "p1"
       };
       /* If game is 2-player computer plays after pair is selected by p1 */
-      if (newState.gameType === '2-player' && newState.turn === 'p2') {
+      if (newState.gameType === "2-player" && newState.turn === "p2") {
         setTimeout(this.playComputerMove, 800);
       }
       return newState;
@@ -76,15 +76,15 @@ class Game extends Component {
   getWinner = () => {
     let p1Matches = 0;
     let p2Matches = 0;
-    this.state.matches.map(match => {
-      match.owner === 'p1' ? p1Matches++ : p2Matches++;
+    this.state.matches.forEach(match => {
+      match.owner === "p1" ? p1Matches++ : p2Matches++;
     });
     if (p1Matches === p2Matches) {
-      return { winner: 'Tie', count: p1Matches };
+      return { winner: "Tie", count: p1Matches };
     } else if (p1Matches > p2Matches) {
-      return { winner: 'You', count: p1Matches };
+      return { winner: "You", count: p1Matches };
     }
-    return { winner: 'Computer', count: p2Matches };
+    return { winner: "Computer", count: p2Matches };
   };
 
   initialCards = () => {
@@ -92,8 +92,7 @@ class Game extends Component {
       .fill(1)
       .map((card, index) => ({
         suit: CARD_SUITS[index % CARD_SUITS.length],
-        value: CARD_VALUES[index % CARD_VALUES.length],
-        location: index
+        value: CARD_VALUES[index % CARD_VALUES.length]
       }));
   };
 
@@ -105,8 +104,8 @@ class Game extends Component {
     matchedCards: {},
     unmatchedFlippedCards: {},
     matches: [],
-    statusMessage: 'Click two cards to start',
-    turn: 'p1'
+    statusMessage: "Click two cards to start",
+    turn: "p1"
   });
 
   key = card => card.value + card.suit;
@@ -115,7 +114,7 @@ class Game extends Component {
   matched pair will be displayed in the matchesSection ("Your Matches",
   "Computer's Matches") */
   matchedCards = ownerToFindMatchesFor => {
-    if (this.state.gameType === '2-player') {
+    if (this.state.gameType === "2-player") {
       return this.state.matches
         .filter(({ owner }) => owner === ownerToFindMatchesFor)
         .map(({ cards, owner }, i) => (
@@ -123,7 +122,7 @@ class Game extends Component {
             className="pairs"
             key={`owner-${cards[0].value}-${cards[0].suit}-${i}`}
           >
-            {cards[0].value} {suitSymbol(cards[0].suit)}{' '}
+            {cards[0].value} {suitSymbol(cards[0].suit)}{" "}
             {suitSymbol(cards[1].suit)}
           </li>
         ));
@@ -136,36 +135,36 @@ class Game extends Component {
   };
 
   matchesSection = () => {
-    return this.state.gameType === '2-player' ? (
+    return this.state.gameType === "2-player" ? (
       <div className="player-wrapper">
         <div className="player-1">
           <h3>Your Matches</h3>
-          <ul className="matches-list">{this.matchedCards('p1')}</ul>
+          <ul className="matches-list">{this.matchedCards("p1")}</ul>
         </div>
         <div className="player-2">
           <h3>Computer's Matches</h3>
-          <ul className="matches-list">{this.matchedCards('p2')}</ul>
+          <ul className="matches-list">{this.matchedCards("p2")}</ul>
         </div>
         <p>{`Matches so far: ${this.state.matches.length}`}</p>
       </div>
     ) : (
       <div className="single-player-wrapper">
         <h3>Your Matches</h3>
-        <ul className="matches-list">{this.matchedCards('p1')}</ul>
+        <ul className="matches-list">{this.matchedCards("p1")}</ul>
         <p>{`Matches so far: ${this.state.matches.length}`}</p>
       </div>
     );
   };
 
-  onCardClick = card => e => {
+  onCardClick = index => e => {
     const { gameType, turn, flippedCardsIndices } = this.state;
-    const isComputerMove = gameType === '2-player' && turn === 'p2';
+    const isComputerMove = gameType === "2-player" && turn === "p2";
     if (flippedCardsIndices.length >= 2 || isComputerMove) {
       return;
     }
     this.setState(state => {
       let { flippedCardsIndices } = state;
-      flippedCardsIndices.push(card.location);
+      flippedCardsIndices.push(index);
       if (flippedCardsIndices.length === 2) {
         setTimeout(this.checkForMatch, 500);
       }
@@ -180,16 +179,15 @@ class Game extends Component {
   playComputerMove = () => {
     const { unmatchedFlippedCards, flippedCardsIndices, deck } = this.state;
     const perfectMove = previousGuesses => {
-      const guessesGroupedByValue = Object.keys(previousGuesses).reduce(
-        (acc, index) => {
-          if (unmatchedFlippedCards[index]) {
-            const card = deck[index];
-            acc[card.value] = { ...acc[card.value], [index]: true };
-          }
-          return acc;
-        },
-        CARD_VALUES.reduce((acc, value) => ({ ...acc, [value]: {} }), {})
-      );
+      const guessesGroupedByValue = Object.keys(
+        previousGuesses
+      ).reduce((acc, index) => {
+        if (unmatchedFlippedCards[index]) {
+          const card = deck[index];
+          acc[card.value] = { ...acc[card.value], [index]: true };
+        }
+        return acc;
+      }, CARD_VALUES.reduce((acc, value) => ({ ...acc, [value]: {} }), {}));
       let seenPair = undefined;
       CARD_VALUES.every(value => {
         const seenCardsForValue = guessesGroupedByValue[value];
@@ -213,6 +211,7 @@ class Game extends Component {
     };
 
     /* Try to find solution from previously seen (flipped) cards */
+
     const perfectMoveFromPrevious = perfectMove(unmatchedFlippedCards);
     if (perfectMoveFromPrevious) {
       return executeComputerMove(perfectMoveFromPrevious);
@@ -227,7 +226,9 @@ class Game extends Component {
       ...unmatchedFlippedCards,
       [unmatchedUnseenIndexes[0]]: true
     };
-    const perfectMoveFromOneGuess = perfectMove(unmatchedFlippedCards);
+    const perfectMoveFromOneGuess = perfectMove(
+      unmatchedFlippedCardsPlusOneGuess
+    );
     if (perfectMoveFromOneGuess) {
       return executeComputerMove(perfectMoveFromOneGuess);
     }
@@ -245,10 +246,9 @@ class Game extends Component {
       return (
         <div>
           <div className="game-over">Game Over!</div>
-          {this.state.gameType === '2-player' && (
-            <div className="winner">{`Winner: ${this.getWinner().winner} with ${
-              this.getWinner().count
-            } matches`}</div>
+          {this.state.gameType === "2-player" && (
+            <div className="winner">{`Winner: ${this.getWinner()
+              .winner} with ${this.getWinner().count} matches`}</div>
           )}
           <button onClick={() => this.restartGame()}>Play Again</button>
           <div className="matches-wrapper">{this.matchesSection()}</div>
@@ -279,11 +279,11 @@ class Game extends Component {
         ) : (
           <Card
             id={`${card.value}-${card.suit}`}
-            key={`${card.value}-${card.suit}`}
+            key={`${card.value}-${card.suit}-${index}`}
             value={card.value}
             suit={card.suit}
             flipped={this.state.flippedCardsIndices.indexOf(index) > -1}
-            onClick={this.onCardClick(card)}
+            onClick={this.onCardClick(index)}
           />
         )
     );
@@ -296,7 +296,7 @@ class Game extends Component {
     }));
 
   setGameType = type => () => {
-    console.log('type selected', type);
+    console.log("type selected", type);
     return this.setState(state => {
       return {
         ...state,
@@ -309,8 +309,8 @@ class Game extends Component {
     return (
       <div className="start-buttons">
         <h2>Welcome to Match Two! How would you like to play?</h2>
-        <button onClick={this.setGameType('single')}>By Myself</button>
-        <button onClick={this.setGameType('2-player')}>Against Computer</button>
+        <button onClick={this.setGameType("single")}>By Myself</button>
+        <button onClick={this.setGameType("2-player")}>Against Computer</button>
       </div>
     );
   };
